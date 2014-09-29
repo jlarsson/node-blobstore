@@ -3,6 +3,9 @@ tmp
 temp
 *.tmp
 
+# Ztuff
+*.tgz
+
 # Logs
 logs
 *.log
