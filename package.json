@@ -1,25 +1,30 @@
 {
-    "name": "blobstore",
-    "version": "0.0.0",
-    "description": "",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/jlarsson/node-blobstore.git"
-    },
-    "author": "",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/jlarsson/node-blobstore/issues"
-    },
-    "homepage": "https://github.com/jlarsson/node-blobstore",
-    "dependencies": {
-        "inherits": "~2.0.1",
-        "debug": "~2.0.0",
-        "mkdirp": "~0.5.0",
-        "highlander": "0.0.1"
-    }
+  "name": "blobstore",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test/*.js --reporter spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jlarsson/node-blobstore.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jlarsson/node-blobstore/issues"
+  },
+  "homepage": "https://github.com/jlarsson/node-blobstore",
+  "dependencies": {
+    "inherits": "~2.0.1",
+    "debug": "~2.0.0",
+    "mkdirp": "~0.5.0",
+    "highlander": "0.0.1",
+    "fs-walk": "0.0.1",
+    "bufferstream": "~0.6.2"
+  },
+  "devDependencies": {
+    "mocha": "~1.21.4"
+  }
 }

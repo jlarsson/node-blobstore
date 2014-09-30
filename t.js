@@ -1,54 +1,65 @@
 var fs = require('fs'),
+    fspath = require('path'),
+    fswalk = require('fs-walk'),
+
     blobstore = require('./index');
 
 
 var store = blobstore.createFileBlobStore('tmp/.bs');
 
-/*
-var path = 'D:\\github\\angular.js\\CHANGELOG.md';
-//var path = 'package.json';
-store.add(blobstore.FileSource(path, 'changelog.md'), function (error, data) {
-    if (error) {
-        return console.error(error);
+
+
+function whenAll(action)
+{
+    var triggered = false;
+    var count = 0;
+    function test(){
+        if (!triggered){
+            setImmediate(function (){
+                if ((!triggered) && (count == 0)){
+                    triggered = true;
+                    action();
+                }
+            })
+        }
     }
-    //console.log(data);
-});
-*/
+    return {
+        enter: function () { ++count; },
+        leave: function (msg) { --count; if (msg) { console.log('%s (%d)', msg, count); } test(); },
+    };
+}
 
-
-fs.readdir('.', function (err, files) {
-
-    for (var i = 0; i < files.length; ++i) {
-        store.add(blobstore.FileSource(files[i], files[i]), function (error, data) {
-            if (error) {
-                return console.error(error);
+var t = whenAll(
+    function () {
+        store.getBlob('index.js', function (err, blob) {
+            if (err) {
+                return console.error(err);
             }
-            //console.log(data);
-        });
-        store.add(blobstore.FileSource(files[i], 'x-' + files[i]), function (error, data) {
-            if (error) {
-                return console.error(error);
+            if (!blob) {
+                return console.error('blob not found');
             }
-            //console.log(data);
+
+            blob.pipe(process.stdout);
         });
     }
+);
 
-});
-
-
-
-store.getIndex(function (err, index) {
-    console.log(index);
-});
-
-
-store.getBlob('index.js', function (err, blob){
-    if (err){
-        return console.error(err);
-    }
-    if (!blob){
-        return console.error('blob not found');
-    }
-
-    blob.pipe(process.stdout);
-});
+fswalk.walk('node_modules', function (folder, name, stat, next) {
+        if (stat.isFile()) {
+            var p = fspath.join(folder, name);
+            console.log('adding %s', name);
+            t.enter();
+            store.add(blobstore.FileSource(p, name), function (error, data) {
+                //console.log('added %j',data);
+                if (error) {
+                    return t.leave(error);
+                }
+                t.leave('done with ' + data.key);
+                //t.leave();
+            });
+            
+        }
+        next();
+    },
+    function (err) {
+    });
