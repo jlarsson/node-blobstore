@@ -1,65 +1,55 @@
 var fs = require('fs'),
     fspath = require('path'),
     fswalk = require('fs-walk'),
-
+    async = require('async'),
     blobstore = require('./index');
 
 
 var store = blobstore.createFileBlobStore('tmp/.bs');
 
+var filesToAdd = [];
 
-
-function whenAll(action)
-{
-    var triggered = false;
-    var count = 0;
-    function test(){
-        if (!triggered){
-            setImmediate(function (){
-                if ((!triggered) && (count == 0)){
-                    triggered = true;
-                    action();
-                }
-            })
-        }
-    }
-    return {
-        enter: function () { ++count; },
-        leave: function (msg) { --count; if (msg) { console.log('%s (%d)', msg, count); } test(); },
-    };
-}
-
-var t = whenAll(
-    function () {
-        store.getBlob('index.js', function (err, blob) {
-            if (err) {
-                return console.error(err);
-            }
-            if (!blob) {
-                return console.error('blob not found');
-            }
-
-            blob.pipe(process.stdout);
-        });
-    }
-);
-
-fswalk.walk('node_modules', function (folder, name, stat, next) {
+function collectFilesToAdd(cb) {
+    fswalk.walk('node_modules', function (folder, name, stat, next) {
         if (stat.isFile()) {
-            var p = fspath.join(folder, name);
-            console.log('adding %s', name);
-            t.enter();
-            store.add(blobstore.FileSource(p, name), function (error, data) {
-                //console.log('added %j',data);
-                if (error) {
-                    return t.leave(error);
-                }
-                t.leave('done with ' + data.key);
-                //t.leave();
+            filesToAdd.push({
+                name: name,
+                path: fspath.join(folder, name)
             });
-            
         }
         next();
-    },
-    function (err) {
+    }, cb);
+}
+
+function addCollectedFiles(cb) {
+    async.eachSeries(
+        filesToAdd,
+        function (file, cb) {
+            store.add(blobstore.FileSource(file.path, file.name), cb);
+        },
+        cb);
+}
+
+function dumpSomeBlob(cb) {
+    store.getBlob('index.js', function (err, blob) {
+        if (err) {
+            return cb(err);
+        }
+        if (!blob) {
+            return cb('blob not found');
+        }
+
+        blob.createPipeable()
+            .on('end', cb)
+            .pipe(process.stdout);
+
     });
+}
+
+function finalWords(err) {
+    if (err) {
+        return console.error(err);
+    }
+    console.log('done.');
+}
+async.series([collectFilesToAdd, addCollectedFiles, dumpSomeBlob], finalWords);
