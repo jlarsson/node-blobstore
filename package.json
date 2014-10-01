@@ -17,15 +17,21 @@
   },
   "homepage": "https://github.com/jlarsson/node-blobstore",
   "dependencies": {
-    "inherits": "~2.0.1",
+    "async": "~0.9.0",
+    "commander": "^2.3.0",
     "debug": "~2.0.0",
-    "mkdirp": "~0.5.0",
-    "highlander": "0.0.1",
     "fs-walk": "0.0.1",
-     "async": "~0.9.0",
+    "glob": "^4.0.6",
+    "highlander": "0.0.2",
+    "inherits": "~2.0.1",
+    "minimatch": "^1.0.0",
+    "mkdirp": "~0.5.0",
     "uuid": "~2.0.1"
   },
   "devDependencies": {
     "mocha": "~1.21.4"
+  },
+  "bin": {
+    "blobstore-cli": "blobstore-cli.js"
   }
 }

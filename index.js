@@ -21,6 +21,9 @@
         return new BlobStore({
             vault: new FileVault(fspath.join(folder, '.blob')),
             repo: repository.create({
+                model: {
+                    blob: {}
+                },
                 journal: highlander.fileJournal({
                     path: fspath.join(folder, '.journal')
                 })
