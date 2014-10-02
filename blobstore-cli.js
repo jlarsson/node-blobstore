@@ -54,6 +54,8 @@ program
         }
 
         function list(cb) {
+            //console.log(state.index);
+            spec = '**/*.js';
             var filter = spec ? function (n) {
                 return minimatch(n, spec);
             } : function () {
@@ -165,9 +167,13 @@ program
                 function (path, cb) {
                     if (path.match(/.*\/$/)) {
                         return cb();
-                    }
+                    }   
                     console.log('adding %s', path);
-                    state.store.add(blobstore.FileSource(path, path), cb);
+                    
+                    var key = path.split('/')
+                        .filter(function (n) { return n && (n !== '.') && (n != '..'); })
+                        .join('/');
+                    state.store.add(blobstore.FileSource(key, path), cb);
 
                 },
                 cb);

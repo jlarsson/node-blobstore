@@ -32,6 +32,6 @@
     "mocha": "~1.21.4"
   },
   "bin": {
-    "blobstore-cli": "blobstore-cli.js"
+    "blobstore": "blobstore-cli.js"
   }
 }
