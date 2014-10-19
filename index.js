@@ -18,14 +18,15 @@
 
 
     module.exports.createFileBlobStore = function (folder) {
+        var root = fspath.resolve(folder);
         return new BlobStore({
-            vault: new FileVault(fspath.join(folder, '.blob')),
+            vault: new FileVault(fspath.join(root, '.blob')),
             repo: repository.create({
                 model: {
                     blob: {}
                 },
                 journal: highlander.fileJournal({
-                    path: fspath.join(folder, '.journal')
+                    path: fspath.join(root, '.journal')
                 })
             })
         });

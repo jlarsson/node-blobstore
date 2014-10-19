@@ -1,32 +1,80 @@
 var blobstore = require('../'),
     async = require('async'),
-    asyncTestHelper = require('./async-test-helper'),
     uuid = require('uuid'),
     assert = require('assert'),
     fs = require('fs'),
     path = require('path'),
-    mkdirp = require('mkdirp');
+    mkdirp = require('mkdirp'),
+    rmrf = require('rimraf');
 
 describe('blobstore', function () {
+    var testFolder;
+    var store;
+
+    before(function (next) {
+        console.log('::before');
+        next();
+    });
+    beforeEach(function (next) {
+        console.log('::beforeEach');
+        testFolder = './tmp/test/' + uuid.v4();
+        var storeFolder = path.join(testFolder, 'bs');
+        mkdirp(testFolder, function (err) {
+            store = blobstore.createFileBlobStore(storeFolder);
+            next(err);
+        });
+    });
+    afterEach(function (next) {
+        console.log('::afterEach');
+        next();
+    });
+    after(function (next) {
+        console.log('::after');
+        rmrf(testFolder,next);
+    });
+
     it('added content can be read back', function (done) {
 
-        var tempRoot = './tmp/test-' + uuid.v4();
-        var tempFile = path.join(tempRoot, 'testfile.txt');
-        var tempRepoPath = path.join(tempRoot, 'bs');
-
-        var store = blobstore.createFileBlobStore(tempRepoPath);
-        var testHelper = asyncTestHelper();
+        var testFilePath = path.join(testFolder, 'testfile.txt');
+        var blob;
+        var blobBuffer;
         async.series([
-            testHelper.mkdirp(tempRoot),
-            testHelper.writeFile(tempFile, 'hello world'),
-            testHelper.addFileToBlobStore(store, 'test', tempFile),
+            function createTestFile(cb) {
+                    console.log('createTestFile');
+                    fs.writeFile(testFilePath, 'hello world', cb);
+            },
+            function addTestFileToBlobStore(cb) {
+                    console.log('addTestFileToBlobStore');
+                    store.add(blobstore.FileSource('test', testFilePath), cb);
+            },
+            function getBlob(cb) {
+                    console.log('getBlob');
 
-            testHelper.saveBlobContentIntoVar(store, 'test', 'contents-of-test'),
-            testHelper.rmrf(tempRoot)
+                    store.getBlob('test', function (err, b) {
+                        blob = b;
+                        cb(err);
+                    });
+            },
+            function getBlobContent(cb) {
+                    console.log('getBlobContent');
+
+                    blob.read(function (err, b) {
+                        blobBuffer = b;
+                        cb(err);
+                    });
+            },
+            function verify(cb) {
+                    console.log(blobBuffer);
+                    cb();
+            }
         ],
             function (err) {
+                if (err){
+                    console.dir(err);
+                    console.log(err.stack);
+                }
                 assert(!err, err);
-                assert.equal('hello world', testHelper.getVar('contents-of-test'));
+                assert.equal('hello world', blobBuffer.toString());
                 done();
             });
     });
