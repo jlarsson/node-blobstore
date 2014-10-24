@@ -4,7 +4,10 @@ var program = require('commander'),
     glob = require('glob'),
     minimatch = require('minimatch'),
     async = require('async'),
-    blobstore = require('./index');
+    blobstore = require('./index'),
+    mime = require('mime'),
+    fspath = require('path'),
+    _ = require('lodash');
 
 
 function collect(val, memo) {
@@ -47,7 +50,7 @@ program
         }
 
         function getIndex(cb) {
-            state.store.getIndex(function (err, index) {
+            state.store.getAllEntries(function (err, index) {
                 state.index = index;
                 cb(err);
             });
@@ -55,17 +58,19 @@ program
 
         function list(cb) {
             //console.log(state.index);
-            spec = '**/*.js';
+            //spec = '**/*.js';
             var filter = spec ? function (n) {
                 return minimatch(n, spec);
             } : function () {
                 return true;
             }
-            var names = Object.getOwnPropertyNames(state.index).filter(filter);
-            for (var i in names) {
-                var path = names[i];
-                console.log(path);
-            }
+            
+            _(state.index)
+                .map(function (entry){ return entry.headers.origin; })
+                .filter(filter)
+                .forEach(function (origin){ console.log(origin) });
+            
+            //console.dir(state.index);
             cb();
         }
         execute([createStore, getIndex, list]);
@@ -168,13 +173,22 @@ program
                     if (path.match(/.*\/$/)) {
                         return cb();
                     }   
-                    console.log('adding %s', path);
+                    var headers = {
+                        contentType: mime.lookup(path),
+                        origin: fspath.resolve(path)
+                    }
+                    console.log('adding %s (%s)', headers.origin, headers.contentType);
                     
                     var key = path.split('/')
                         .filter(function (n) { return n && (n !== '.') && (n != '..'); })
                         .join('/');
-                    state.store.add(blobstore.FileSource(key, path), cb);
-
+                    state.store.add(
+                        path,
+                        {
+                            hashIsKey: true,
+                            headers: headers
+                        },
+                        cb);
                 },
                 cb);
         }
