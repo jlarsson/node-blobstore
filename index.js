@@ -4,7 +4,6 @@
 
     var fspath = require('path'),
         BlobStore = require('./lib/blobstore'),
-        FileSource = require('./lib/filesource'),
         FileVault = require('./lib/filevault'),
         repository = require('./lib/repository'),
         highlander = require('highlander');
@@ -13,7 +12,8 @@
     module.exports = function (options) {
         return new BlobStore(options);
     }
-    module.exports.FileSource = FileSource;
+    module.exports.FileSource = require('./lib/filesource');
+    module.exports.BufferSource = require('./lib/buffersource');
     module.exports.FileVault = FileVault;
 
 
