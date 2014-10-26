@@ -46,7 +46,7 @@ describe('blobstore:add() / getBlob()', function () {
     function runTest(source, done){
         async.seq(
             function addSomethingToBlobStore(cb) {
-                store.add(source, {
+                store.addBlob(source, {
                     key: 'test'
                 }, cb);
             },
