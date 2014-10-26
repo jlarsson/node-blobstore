@@ -8,14 +8,15 @@ var blobstore = require('../'),
     rmrf = require('rimraf');
 
 describe('blobstore:add() / getBlob()', function () {
+    
     it('Buffer', function (done) {
         runTest(new Buffer(EXPECTED), done);
     });
-    it('BufferSource', function (done) {
-        runTest(blobstore.BufferSource(new Buffer(EXPECTED)), done);
+    it('BufferBlob', function (done) {
+        runTest(blobstore.BufferBlob(new Buffer(EXPECTED)), done);
     });
-    it('FileSource', function (done) {
-        runTest(blobstore.FileSource(testSourcePath), done);
+    it('FileBlob', function (done) {
+        runTest(blobstore.FileBlob(testSourcePath), done);
     });
     it('path', function (done) {
         runTest(testSourcePath, done);
@@ -43,15 +44,13 @@ describe('blobstore:add() / getBlob()', function () {
         rmrf(testFolder, next);
     });
 
-    function runTest(source, done){
+    function runTest(sourceBlob, done){
         async.seq(
             function addSomethingToBlobStore(cb) {
-                store.addBlob(source, {
-                    key: 'test'
-                }, cb);
+                store.addBlob(sourceBlob,cb);
             },
             function getBlob(addedBlob, cb) {
-                store.getBlob('test', cb);
+                store.getBlob(addedBlob.key, cb);
             },
             function getBlobContent(blob, cb) {
                 blob.read(cb);
