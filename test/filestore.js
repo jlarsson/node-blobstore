@@ -7,7 +7,7 @@ var blobstore = require('../'),
     mkdirp = require('mkdirp'),
     rmrf = require('rimraf');
 
-describe('blobstore:add() / getBlob()', function () {
+describe('fileBlobStore: add() / getBlob()', function () {
     
     it('Buffer', function (done) {
         runTest(new Buffer(EXPECTED), done);

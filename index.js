@@ -5,6 +5,7 @@
     var fspath = require('path'),
         BlobStore = require('./lib/blobstore'),
         FileVault = require('./lib/filevault'),
+        MemoryVault = require('./lib/memoryvault'),
         FileBlob = require('./lib/fileblob'),
         BufferBlob = require('./lib/bufferblob'),
         repository = require('./lib/repository'),
@@ -22,14 +23,18 @@
         return Buffer.isBuffer(pathOrBuffer) ? new BufferBlob(pathOrBuffer, options) : new FileBlob(pathOrBuffer, options);
     };
 
+    module.exports.createMemoryBlobStore = function () {
+        return new BlobStore({
+            vault: new MemoryVault(),
+            repo: repository.create({})
+        });
+    };
+
     module.exports.createFileBlobStore = function (folder) {
         var root = fspath.resolve(folder);
         return new BlobStore({
             vault: new FileVault(fspath.join(root, '.blob')),
             repo: repository.create({
-                model: {
-                    blob: {}
-                },
                 journal: highlander.fileJournal({
                     path: fspath.join(root, '.journal')
                 })
