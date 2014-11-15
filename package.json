@@ -4,7 +4,7 @@
   "description": "Store blobs. Retreive blobs. Do blobby stuff with blobs.",
   "keywords": ["blob"],
   "main": "index.js",
-  "files": ["index.js","lib/*.js"],
+  "files": ["index.js", "lib/*.js", "LICENSE", "README.md"],
   "scripts": {
     "test": "mocha test/*.js --reporter spec"
   },
@@ -13,7 +13,10 @@
     "url": "https://github.com/jlarsson/node-blobstore.git"
   },
   "author": "",
-  "license": "MIT",
+  "license": {
+    "type": "MIT",
+    "url": "https://github.com/jlarsson/node-blobstore/blob/master/LICENSE"
+  },
   "bugs": {
     "url": "https://github.com/jlarsson/node-blobstore/issues"
   },
