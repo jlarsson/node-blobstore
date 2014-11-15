@@ -1,8 +1,10 @@
 {
   "name": "blobstore",
   "version": "0.0.1",
-  "description": "",
+  "description": "Store blobs. Retreive blobs. Do blobby stuff with blobs.",
+  "keywords": ["blob"],
   "main": "index.js",
+  "files": ["index.js","lib/*.js"],
   "scripts": {
     "test": "mocha test/*.js --reporter spec"
   },
