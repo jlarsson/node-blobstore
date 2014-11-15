@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/jlarsson/node-blobstore.svg?branch=master)](https://travis-ci.org/jlarsson/node-blobstore)
+
 ## node-blobstore
 Store blobs. Retreive blobs. Do blobby stuff with blobs.
 
