@@ -33,6 +33,6 @@
   "devDependencies": {
     "mocha": "~1.21.4",
     "rimraf": "^2.2.8",
-    "mime": "~1.2.11"
+    "mime": "~2.4.4"
   }
 }
